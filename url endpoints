@@ -1,0 +1,5 @@
+POST http://127.0.0.1:8000/api/upload/
+POST http://127.0.0.1:8000/api/search/internal/
+POST http://127.0.0.1:8000/api/search/external/
+POST http://127.0.0.1:8000/api/auditor/rotate-key/
+GET http://127.0.0.1:8000/api/auditor/<auditor_id>/logs/
