@@ -8,6 +8,7 @@ import {
 
 export default function SearchPage({ role }) {
   const [query, setQuery] = useState("");
+  const [field, setField] = useState("pan");   // ✅ dynamic field
   const [results, setResults] = useState([]);
   const [meta, setMeta] = useState(null);
   const [logs, setLogs] = useState(["Awaiting search query..."]);
@@ -25,14 +26,15 @@ export default function SearchPage({ role }) {
       setLogs(["Preparing search..."]);
 
       // =========================
-      // INTERNAL SEARCH
+      // INTERNAL SEARCH (SSE)
       // =========================
       if (role === "internal") {
         await delay(400);
         setLogs(prev => [...prev, "Generating HMAC trapdoor..."]);
 
+        // ✅ Dynamic field payload
         const payload = {
-          pan: query   // ⚠️ adjust field if backend expects different
+          [field]: query
         };
 
         await delay(500);
@@ -43,21 +45,21 @@ export default function SearchPage({ role }) {
           payload
         );
 
-        setResults(res.data.data.results || []);
+        setResults(res.data.data?.results || []);
         setMeta(res.data.meta);
 
-        // setLogs(prev => [...prev, "Decrypting records..."]);
         setLogs(prev => [...prev, "Internal search complete ✔"]);
       }
 
       // =========================
-      // EXTERNAL SEARCH
+      // EXTERNAL SEARCH (Public Key)
       // =========================
       if (role === "external") {
         const privateKey = localStorage.getItem("auditor_private_key");
 
         if (!privateKey) {
           setLogs(prev => [...prev, "No auditor private key found"]);
+          setLoading(false);
           return;
         }
 
@@ -90,7 +92,7 @@ export default function SearchPage({ role }) {
           payload
         );
 
-        setResults(res.data.data.results || []);
+        setResults(res.data.data?.results || []);
         setMeta(res.data.meta);
 
         setLogs(prev => [...prev, "Encrypted results received ✔"]);
@@ -100,7 +102,10 @@ export default function SearchPage({ role }) {
       console.error(err);
 
       if (err.response?.data?.error) {
-        setLogs(prev => [...prev, `Error: ${err.response.data.error.code}`]);
+        setLogs(prev => [
+          ...prev,
+          `Error: ${err.response.data.error.code}`
+        ]);
       } else {
         setLogs(prev => [...prev, "Unknown error occurred"]);
       }
@@ -122,10 +127,26 @@ export default function SearchPage({ role }) {
       {/* SEARCH INPUT */}
       <div className="bg-white border rounded-xl p-6 mb-6">
         <div className="flex gap-3">
+
+          {/* ✅ Field Selector (Internal Only) */}
+          {role === "internal" && (
+            <select
+              value={field}
+              onChange={(e) => setField(e.target.value)}
+              className="border rounded px-3 py-2"
+            >
+              <option value="pan">PAN</option>
+              <option value="customer_id">Customer ID</option>
+              <option value="aadhaar">Aadhaar</option>
+              <option value="name">Name</option>
+              <option value="compliance_flag">Compliance Flag</option>
+            </select>
+          )}
+
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Enter PAN or search value..."
+            placeholder="Enter search value..."
             className="flex-1 border rounded px-4 py-2"
           />
 
@@ -151,7 +172,10 @@ export default function SearchPage({ role }) {
           ) : (
             <div className="space-y-3">
               {results.map((r, i) => (
-                <div key={i} className="bg-gray-50 border rounded p-3 font-mono text-sm">
+                <div
+                  key={i}
+                  className="bg-gray-50 border rounded p-3 font-mono text-sm"
+                >
                   {JSON.stringify(r, null, 2)}
                 </div>
               ))}
