@@ -1,15 +1,21 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import UploadPage from "../components/UploadPage";
 import SearchPage from "../components/SearchPage";
-// import StoragePage from "../components/StoragePage";
 import MetricsPage from "../components/MetricsPage";
 
-export default function Dashboard({ role, auditor, privateKey, logout }) {
+export default function Dashboard({ role, logout, auditor, privateKey }) {
+
   const [activeTab, setActiveTab] = useState("upload");
 
-  const isInternal = role === "internal";
-  const isExternal = role === "external";
+  // Set default tab based on role
+  useEffect(() => {
+    if (role === "external") {
+      setActiveTab("search");
+    } else {
+      setActiveTab("upload");
+    }
+  }, [role]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -21,11 +27,8 @@ export default function Dashboard({ role, auditor, privateKey, logout }) {
       />
 
       {/* CONTENT */}
+      {activeTab === "upload" && role === "internal" && <UploadPage />}
 
-      {/* Internal Upload */}
-      {activeTab === "upload" && isInternal && <UploadPage />}
-
-      {/* Search (Internal + External) */}
       {activeTab === "search" && (
         <SearchPage
           role={role}
@@ -34,10 +37,6 @@ export default function Dashboard({ role, auditor, privateKey, logout }) {
         />
       )}
 
-      {/* Internal Storage */}
-      {/* {activeTab === "storage" && isInternal && <StoragePage />} */}
-
-      {/* Metrics */}
       {activeTab === "metrics" && (
         <MetricsPage role={role} />
       )}
