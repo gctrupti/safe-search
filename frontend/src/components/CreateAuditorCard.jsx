@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import api from "../services/api";
 
 export default function CreateAuditorCard({ onCreated }) {
   const [name, setName] = useState("");
@@ -13,8 +13,8 @@ export default function CreateAuditorCard({ onCreated }) {
     try {
       setLoading(true);
 
-      const res = await axios.post(
-        "http://127.0.0.1:8000/api/auditor/create/",
+      const res = await api.post(
+        "/api/auditor/create/",
         { name }
       );
 

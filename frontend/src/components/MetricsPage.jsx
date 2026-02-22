@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../services/api";
 import CreateAuditorCard from "./CreateAuditorCard";
 
 export default function MetricsPage({ role }) {
@@ -17,13 +17,13 @@ export default function MetricsPage({ role }) {
       setLoading(true);
 
       if (isInternal) {
-        const res = await axios.get(
-          "http://127.0.0.1:8000/api/metrics/internal/"
+        const res = await api.get(
+          "/api/metrics/internal/"
         );
         setInternalData(res.data?.data || {});
       } else {
-        const res = await axios.get(
-          "http://127.0.0.1:8000/api/metrics/external/"
+        const res = await api.get(
+          "/api/metrics/external/"
         );
         setExternalData(res.data?.data || {});
       }
@@ -42,8 +42,8 @@ export default function MetricsPage({ role }) {
 
   const handleDeleteAuditor = async (auditorId) => {
     try {
-      await axios.delete(
-        `http://127.0.0.1:8000/api/auditor/${auditorId}/delete/`
+      await api.delete(
+        `/api/auditor/${auditorId}/delete/`
       );
 
       // Refresh metrics after deletion

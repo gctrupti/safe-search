@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import api from "../services/api";
 import {
   normalizeKeyword,
   sha256Hex,
@@ -37,8 +37,8 @@ export default function SearchPage({ role, auditor, privateKey }) {
         await delay(300);
         setLogs(prev => [...prev, "Sending request to /api/search/internal/"]);
 
-        const res = await axios.post(
-          "http://127.0.0.1:8000/api/search/internal/",
+        const res = await api.post(
+          "/api/search/internal/",
           payload
         );
 
@@ -88,8 +88,8 @@ export default function SearchPage({ role, auditor, privateKey }) {
         await delay(300);
         setLogs(prev => [...prev, "Sending request to /api/search/external/"]);
 
-        const res = await axios.post(
-          "http://127.0.0.1:8000/api/search/external/",
+        const res = await api.post(
+          "/api/search/external/",
           payload
         );
 
