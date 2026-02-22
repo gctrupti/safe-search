@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: safe-search-backend
+    env: docker
+    region: ohio # Change as needed
+    plan: free # Change as needed
+    dockerContext: ./backend
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: MASTER_KEY
+        sync: false # Set in Render Dashboard or .env
+      - key: DB_NAME
+        sync: false # Set in Render Dashboard
+      - key: DB_USER
+        sync: false # Set in Render Dashboard
+      - key: DB_PASSWORD
+        sync: false # Set in Render Dashboard
+      - key: DB_HOST
+        sync: false # Set in Render Dashboard
+      - key: DB_PORT
+        sync: false # Set in Render Dashboard
+      - key: PYTHON_VERSION
+        value: 3.11.1
